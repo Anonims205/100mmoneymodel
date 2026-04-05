@@ -1,0 +1,1660 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gudang Sparepart 3D Pro</title>
+<style>
+/* ============================================================
+   DESIGN SYSTEM — Industrial Dark Theme
+   ============================================================ */
+:root {
+  --bg0: #0e0e0c;
+  --bg1: #161614;
+  --bg2: #1e1e1b;
+  --bg3: #262623;
+  --bg4: #2e2e2a;
+  --line: rgba(255,255,255,0.07);
+  --line2: rgba(255,255,255,0.13);
+  --line3: rgba(255,255,255,0.22);
+  --t1: #e8e6de;
+  --t2: #9c9a92;
+  --t3: #666460;
+  --accent: #e8a020;
+  --accent2: #f0c060;
+  --accent-bg: rgba(232,160,32,0.12);
+  --blue: #4a9fd4;
+  --blue-bg: rgba(74,159,212,0.14);
+  --green: #3db87a;
+  --green-bg: rgba(61,184,122,0.12);
+  --red: #e05555;
+  --red-bg: rgba(224,85,85,0.12);
+  --purple: #9b7de8;
+  --r-sm: 6px; --r-md: 8px; --r-lg: 12px;
+  --sh: 0 2px 12px rgba(0,0,0,0.5);
+  --sh-lg: 0 8px 32px rgba(0,0,0,0.7);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: var(--bg0);
+  color: var(--t1);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  user-select: none;
+}
+
+/* ── TOPBAR ── */
+#topbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 16px;
+  height: 48px;
+  background: var(--bg1);
+  border-bottom: 1px solid var(--line);
+  flex-shrink: 0;
+  z-index: 50;
+}
+#topbar .logo {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 13px; font-weight: 700; letter-spacing: .5px;
+  color: var(--accent); white-space: nowrap;
+}
+#topbar .logo svg { opacity: .9; }
+
+.top-sep { width: 1px; height: 24px; background: var(--line2); flex-shrink: 0; }
+
+#tab-bar { display: flex; gap: 2px; }
+.tab {
+  padding: 6px 14px;
+  border-radius: var(--r-sm);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  color: var(--t3);
+  transition: all .15s;
+  border: 1px solid transparent;
+}
+.tab:hover { color: var(--t1); background: var(--bg3); }
+.tab.active { color: var(--accent); background: var(--accent-bg); border-color: rgba(232,160,32,0.25); }
+
+.spacer { flex: 1; }
+
+.top-btn {
+  display: flex; align-items: center; gap: 5px;
+  padding: 5px 12px;
+  border-radius: var(--r-sm);
+  font-size: 12px; font-weight: 500;
+  cursor: pointer; border: 1px solid var(--line2);
+  background: var(--bg3); color: var(--t2);
+  transition: all .15s; white-space: nowrap;
+  font-family: inherit;
+}
+.top-btn:hover { background: var(--bg4); color: var(--t1); border-color: var(--line3); }
+.top-btn.accent { background: var(--accent); color: #000; border-color: var(--accent); font-weight: 700; }
+.top-btn.accent:hover { background: var(--accent2); }
+
+/* ── MAIN ── */
+#main { display: flex; flex: 1; overflow: hidden; }
+
+/* ── LEFT SIDEBAR ── */
+#sidebar-left {
+  width: 220px; min-width: 220px;
+  background: var(--bg1);
+  border-right: 1px solid var(--line);
+  display: flex; flex-direction: column;
+  overflow: hidden;
+  transition: width .2s;
+}
+#sidebar-left.collapsed { width: 0; min-width: 0; }
+
+.sb-section {
+  border-bottom: 1px solid var(--line);
+  flex-shrink: 0;
+}
+.sb-title {
+  padding: 10px 14px 8px;
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--t3);
+  text-transform: uppercase;
+}
+
+/* Search */
+#search-wrap { padding: 0 10px 10px; }
+#search-input {
+  width: 100%; padding: 7px 10px;
+  background: var(--bg3);
+  border: 1px solid var(--line2);
+  border-radius: var(--r-md);
+  color: var(--t1); font-size: 12px;
+  outline: none; font-family: inherit;
+  transition: border-color .15s;
+}
+#search-input:focus { border-color: var(--accent); }
+#search-input::placeholder { color: var(--t3); }
+
+/* Cat filter */
+#cat-list { padding: 0 10px 10px; display: flex; flex-direction: column; gap: 3px; }
+.cat-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 5px 8px; border-radius: var(--r-sm);
+  cursor: pointer; font-size: 12px; color: var(--t2);
+  transition: all .15s; border: 1px solid transparent;
+}
+.cat-item:hover { background: var(--bg3); color: var(--t1); }
+.cat-item.active { background: var(--bg3); color: var(--t1); border-color: var(--line2); }
+.cat-dot { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
+.cat-cnt { margin-left: auto; font-size: 10px; color: var(--t3); }
+
+/* Stats */
+#stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding: 0 10px 10px; }
+.stat-card {
+  background: var(--bg3); border-radius: var(--r-md);
+  padding: 8px 10px; border: 1px solid var(--line);
+}
+.stat-val { font-size: 18px; font-weight: 700; color: var(--t1); line-height: 1; }
+.stat-lbl { font-size: 10px; color: var(--t3); margin-top: 2px; }
+
+/* Rack list */
+#rack-list-wrap { flex: 1; overflow-y: auto; padding: 0 10px 10px; }
+#rack-list-wrap::-webkit-scrollbar { width: 3px; }
+#rack-list-wrap::-webkit-scrollbar-track { background: transparent; }
+#rack-list-wrap::-webkit-scrollbar-thumb { background: var(--line2); border-radius: 3px; }
+.rack-item {
+  display: flex; align-items: center; gap: 6px;
+  padding: 6px 8px; border-radius: var(--r-sm);
+  cursor: pointer; font-size: 12px; color: var(--t2);
+  transition: all .15s; border: 1px solid transparent;
+  margin-bottom: 2px;
+}
+.rack-item:hover { background: var(--bg3); color: var(--t1); }
+.rack-item.active { background: var(--accent-bg); color: var(--accent); border-color: rgba(232,160,32,0.25); }
+.rack-icon { font-size: 10px; opacity: .6; }
+.rack-pct { margin-left: auto; font-size: 10px; }
+.rack-pct-bar { height: 2px; margin-top: 2px; border-radius: 1px; background: var(--bg4); overflow: hidden; }
+.rack-pct-fill { height: 100%; border-radius: 1px; background: var(--accent); transition: width .3s; }
+
+/* ── CANVAS AREA ── */
+#canvas-wrap {
+  flex: 1; position: relative; overflow: hidden;
+  background: radial-gradient(ellipse at 40% 60%, #1a1a14 0%, #0e0e0c 70%);
+}
+#c { display: block; width: 100%; height: 100%; }
+
+/* Overlay controls */
+#nav-pad {
+  position: absolute; bottom: 20px; left: 20px;
+  display: grid; grid-template-columns: repeat(3, 36px);
+  grid-template-rows: repeat(3, 36px);
+  gap: 4px;
+}
+.nav-btn {
+  border-radius: var(--r-sm);
+  border: 1px solid var(--line2);
+  background: rgba(14,14,12,0.85);
+  color: var(--t2);
+  font-size: 13px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: all .15s; backdrop-filter: blur(4px);
+}
+.nav-btn:hover { background: var(--bg3); color: var(--t1); border-color: var(--line3); }
+.nav-btn:active { transform: scale(.9); }
+.nav-btn.center { background: rgba(232,160,32,0.18); color: var(--accent); border-color: rgba(232,160,32,0.3); }
+
+#zoom-bar {
+  position: absolute; bottom: 20px; right: 20px;
+  display: flex; flex-direction: column; gap: 4px;
+}
+.zoom-btn {
+  width: 36px; height: 36px;
+  border-radius: var(--r-sm); border: 1px solid var(--line2);
+  background: rgba(14,14,12,0.85);
+  color: var(--t2); font-size: 16px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: all .15s; backdrop-filter: blur(4px);
+  font-weight: 700;
+}
+.zoom-btn:hover { background: var(--bg3); color: var(--t1); }
+.zoom-btn:active { transform: scale(.9); }
+
+#view-hint {
+  position: absolute; top: 12px; left: 50%; transform: translateX(-50%);
+  font-size: 11px; color: var(--t3);
+  background: rgba(14,14,12,0.8);
+  padding: 4px 12px; border-radius: 20px;
+  border: 1px solid var(--line); backdrop-filter: blur(4px);
+  white-space: nowrap; pointer-events: none;
+}
+
+#search-highlight-badge {
+  display: none;
+  position: absolute; top: 12px; right: 12px;
+  background: var(--accent-bg); color: var(--accent);
+  border: 1px solid rgba(232,160,32,0.3);
+  font-size: 11px; padding: 4px 10px; border-radius: 20px;
+}
+
+/* ── RIGHT PANEL ── */
+#panel-right {
+  width: 260px; min-width: 260px;
+  background: var(--bg1);
+  border-left: 1px solid var(--line);
+  display: flex; flex-direction: column;
+  overflow: hidden;
+  transition: width .2s;
+}
+#panel-right.collapsed { width: 0; min-width: 0; }
+
+#panel-header {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--line);
+  font-size: 12px; font-weight: 700;
+  color: var(--t2);
+  text-transform: uppercase; letter-spacing: .5px;
+  background: var(--bg2);
+  flex-shrink: 0;
+}
+
+#panel-body { flex: 1; overflow-y: auto; padding: 14px; }
+#panel-body::-webkit-scrollbar { width: 3px; }
+#panel-body::-webkit-scrollbar-thumb { background: var(--line2); border-radius: 3px; }
+
+.p-empty {
+  text-align: center; padding: 32px 16px;
+  color: var(--t3); font-size: 12px; line-height: 1.8;
+}
+.p-empty-icon { font-size: 28px; margin-bottom: 8px; opacity: .4; }
+
+.p-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 3px 10px; border-radius: 20px;
+  font-size: 11px; font-weight: 600;
+}
+.p-row {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  padding: 7px 0; border-bottom: 1px solid var(--line);
+  font-size: 12px; gap: 8px;
+}
+.p-row:last-of-type { border-bottom: none; }
+.p-lbl { color: var(--t3); flex-shrink: 0; }
+.p-val { font-weight: 500; text-align: right; word-break: break-word; }
+.p-mono { font-family: 'Courier New', monospace; font-size: 11px; }
+
+.p-loc {
+  display: flex; align-items: center; gap: 6px;
+  padding: 8px 10px; background: var(--bg3);
+  border-radius: var(--r-md); margin: 8px 0;
+  border: 1px solid var(--line); font-size: 11px;
+}
+.p-loc-icon { color: var(--accent); font-size: 14px; }
+.p-loc-text { color: var(--t2); font-family: monospace; }
+
+.p-actions { display: flex; flex-direction: column; gap: 5px; margin-top: 12px; }
+.p-btn {
+  display: flex; align-items: center; gap: 6px;
+  padding: 8px 12px; border-radius: var(--r-md);
+  border: 1px solid var(--line2);
+  background: var(--bg3); color: var(--t1);
+  font-size: 12px; cursor: pointer; font-family: inherit;
+  transition: all .15s; width: 100%; text-align: left;
+}
+.p-btn:hover { background: var(--bg4); border-color: var(--line3); }
+.p-btn.primary { background: var(--accent-bg); color: var(--accent); border-color: rgba(232,160,32,0.3); }
+.p-btn.primary:hover { background: rgba(232,160,32,0.2); }
+.p-btn.danger { color: var(--red); border-color: rgba(224,85,85,0.25); }
+.p-btn.danger:hover { background: var(--red-bg); }
+
+.warn-box {
+  display: flex; align-items: center; gap: 6px;
+  padding: 7px 10px; border-radius: var(--r-md);
+  background: var(--red-bg); border: 1px solid rgba(224,85,85,0.25);
+  color: var(--red); font-size: 11px; font-weight: 600; margin-bottom: 10px;
+}
+
+/* ── DESIGNER PANEL ── */
+#designer-panel {
+  display: none; flex-direction: column;
+  position: absolute; inset: 0; z-index: 30;
+  background: var(--bg0);
+}
+#designer-panel.open { display: flex; }
+
+#dp-header {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 20px; background: var(--bg1);
+  border-bottom: 1px solid var(--line); flex-shrink: 0;
+}
+#dp-header h2 { font-size: 14px; font-weight: 700; color: var(--accent); }
+
+#dp-body {
+  flex: 1; display: flex; overflow: hidden;
+}
+
+#dp-rack-list {
+  width: 200px; border-right: 1px solid var(--line);
+  overflow-y: auto; background: var(--bg1);
+}
+#dp-rack-list::-webkit-scrollbar { width: 3px; }
+#dp-rack-list::-webkit-scrollbar-thumb { background: var(--line2); }
+
+.dp-rack-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 14px; cursor: pointer;
+  border-bottom: 1px solid var(--line);
+  font-size: 12px; color: var(--t2); transition: all .15s;
+}
+.dp-rack-item:hover { background: var(--bg3); color: var(--t1); }
+.dp-rack-item.active { background: var(--accent-bg); color: var(--accent); }
+.dp-rack-name { font-weight: 600; }
+.dp-rack-sub { font-size: 10px; color: var(--t3); margin-top: 1px; }
+
+.dp-add-rack {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 14px; cursor: pointer;
+  font-size: 12px; color: var(--accent); transition: all .15s;
+  border-top: 1px solid var(--line); margin-top: auto;
+}
+.dp-add-rack:hover { background: var(--accent-bg); }
+
+#dp-editor {
+  flex: 1; overflow-y: auto; padding: 24px;
+  display: flex; flex-direction: column; gap: 20px;
+}
+#dp-editor::-webkit-scrollbar { width: 3px; }
+
+.dp-section { }
+.dp-section-title {
+  font-size: 10px; font-weight: 700; letter-spacing: 1px;
+  color: var(--t3); text-transform: uppercase; margin-bottom: 12px;
+  padding-bottom: 6px; border-bottom: 1px solid var(--line);
+}
+
+.dp-field { margin-bottom: 12px; }
+.dp-field label { display: block; font-size: 11px; color: var(--t2); margin-bottom: 5px; font-weight: 500; }
+.dp-input, .dp-select {
+  width: 100%; padding: 8px 11px;
+  border: 1px solid var(--line2); border-radius: var(--r-md);
+  background: var(--bg3); color: var(--t1);
+  font-size: 13px; outline: none; font-family: inherit;
+  transition: border-color .15s;
+}
+.dp-input:focus, .dp-select:focus { border-color: var(--accent); }
+.dp-row { display: flex; gap: 10px; }
+.dp-row .dp-field { flex: 1; }
+
+/* Grid preview */
+#dp-preview-wrap {
+  background: var(--bg2); border-radius: var(--r-lg);
+  border: 1px solid var(--line); padding: 20px;
+  min-height: 180px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+}
+#dp-preview-title { font-size: 10px; color: var(--t3); margin-bottom: 14px; text-transform: uppercase; letter-spacing: 1px; }
+#dp-grid {
+  display: grid; gap: 5px;
+}
+.dp-cell {
+  border-radius: 4px; border: 1px solid var(--line2);
+  background: var(--bg4); display: flex;
+  align-items: center; justify-content: center;
+  font-size: 9px; color: var(--t3); transition: all .15s;
+  cursor: default; overflow: hidden;
+}
+.dp-cell.filled { background: var(--bg3); border-color: var(--line3); }
+.dp-cell.filled .dp-cell-label { font-size: 8px; color: var(--t2); padding: 2px; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; width: 100%; }
+
+/* Color swatches */
+.swatch-row { display: flex; flex-wrap: wrap; gap: 6px; }
+.swatch {
+  width: 24px; height: 24px; border-radius: 4px;
+  cursor: pointer; border: 2px solid transparent;
+  transition: all .15s;
+}
+.swatch.active, .swatch:hover { border-color: var(--t1); transform: scale(1.15); }
+
+/* Position inputs */
+.dp-pos { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+.dp-actions { display: flex; gap: 8px; }
+.dp-btn {
+  padding: 9px 18px; border-radius: var(--r-md);
+  font-size: 13px; font-weight: 600;
+  cursor: pointer; font-family: inherit;
+  transition: all .15s; border: 1px solid var(--line2);
+}
+.dp-btn.primary { background: var(--accent); color: #000; border-color: var(--accent); }
+.dp-btn.primary:hover { background: var(--accent2); }
+.dp-btn.ghost { background: var(--bg3); color: var(--t1); }
+.dp-btn.ghost:hover { background: var(--bg4); }
+.dp-btn.danger { background: var(--red-bg); color: var(--red); border-color: rgba(224,85,85,0.3); }
+.dp-btn.danger:hover { opacity: .8; }
+
+/* ── MODAL ── */
+#modal-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,.65); z-index: 200;
+  align-items: center; justify-content: center;
+}
+#modal-overlay.open { display: flex; }
+#modal-box {
+  background: var(--bg2); border-radius: var(--r-lg);
+  border: 1px solid var(--line2); padding: 24px;
+  width: 360px; max-width: 95vw; max-height: 90vh; overflow-y: auto;
+  box-shadow: var(--sh-lg);
+}
+#modal-box h3 { font-size: 15px; font-weight: 700; margin-bottom: 18px; color: var(--t1); }
+.m-field { margin-bottom: 12px; }
+.m-field label { display: block; font-size: 11px; color: var(--t2); margin-bottom: 5px; font-weight: 500; }
+.m-input, .m-select, .m-textarea {
+  width: 100%; padding: 8px 11px;
+  border: 1px solid var(--line2); border-radius: var(--r-md);
+  background: var(--bg3); color: var(--t1);
+  font-size: 13px; outline: none; font-family: inherit;
+  transition: border-color .15s;
+}
+.m-input:focus, .m-select:focus, .m-textarea:focus { border-color: var(--accent); }
+.m-input[readonly] { background: var(--bg4); color: var(--t3); cursor: default; }
+.m-textarea { resize: vertical; min-height: 60px; }
+.m-row { display: flex; gap: 10px; }
+.m-row .m-field { flex: 1; }
+.m-footer { display: flex; gap: 8px; margin-top: 16px; justify-content: flex-end; }
+.m-btn {
+  padding: 8px 18px; border-radius: var(--r-md);
+  font-size: 13px; font-weight: 600; cursor: pointer;
+  font-family: inherit; border: 1px solid var(--line2);
+  transition: all .15s;
+}
+.m-btn.cancel { background: var(--bg3); color: var(--t1); }
+.m-btn.cancel:hover { background: var(--bg4); }
+.m-btn.save { background: var(--accent); color: #000; border-color: var(--accent); }
+.m-btn.save:hover { background: var(--accent2); }
+
+/* ── TOAST ── */
+#toast {
+  position: fixed; bottom: 28px; left: 50%;
+  transform: translateX(-50%) translateY(60px);
+  background: var(--bg3); color: var(--t1);
+  padding: 9px 20px; border-radius: 20px;
+  font-size: 12px; z-index: 999;
+  border: 1px solid var(--line3);
+  box-shadow: var(--sh-lg);
+  transition: transform .3s cubic-bezier(.34,1.56,.64,1), opacity .3s;
+  opacity: 0; pointer-events: none; white-space: nowrap;
+}
+#toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+/* Scrollbars global */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--line2); border-radius: 4px; }
+</style>
+</head>
+<body>
+
+<!-- ══ TOPBAR ══ -->
+<div id="topbar">
+  <div class="logo">
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+      <rect x="2" y="12" width="16" height="6" rx="1.5" fill="#e8a020" opacity=".9"/>
+      <rect x="2" y="6.5" width="16" height="4.5" rx="1" fill="#e8a020" opacity=".6"/>
+      <rect x="2" y="2" width="16" height="3.5" rx="1" fill="#e8a020" opacity=".3"/>
+    </svg>
+    SPAREPART 3D PRO
+  </div>
+  <div class="top-sep"></div>
+  <div id="tab-bar">
+    <div class="tab active" onclick="switchTab('view',this)">🏭 Tampilan 3D</div>
+    <div class="tab" onclick="switchTab('design',this)">🔧 Desain Rak</div>
+  </div>
+  <div class="spacer"></div>
+  <button class="top-btn" onclick="toggleSidebar()">☰ Panel</button>
+  <button class="top-btn" onclick="exportCSV()">⬇ CSV</button>
+  <button class="top-btn accent" onclick="openAddModal(null,null)">＋ Tambah</button>
+</div>
+
+<!-- ══ MAIN ══ -->
+<div id="main">
+
+  <!-- LEFT SIDEBAR -->
+  <div id="sidebar-left">
+    <div class="sb-section">
+      <div class="sb-title">Cari</div>
+      <div id="search-wrap">
+        <input id="search-input" type="search" placeholder="Nama, part, lokasi..." oninput="onSearch(this.value)">
+      </div>
+    </div>
+    <div class="sb-section">
+      <div class="sb-title">Kategori</div>
+      <div id="cat-list">
+        <div class="cat-item active" data-cat="all" onclick="filterCat('all',this)">
+          <div class="cat-dot" style="background:var(--t3)"></div>Semua<span class="cat-cnt" id="cnt-all">0</span>
+        </div>
+      </div>
+    </div>
+    <div class="sb-section">
+      <div class="sb-title">Statistik</div>
+      <div id="stat-grid">
+        <div class="stat-card"><div class="stat-val" id="s-rak">0</div><div class="stat-lbl">Rak</div></div>
+        <div class="stat-card"><div class="stat-val" id="s-kotak">0</div><div class="stat-lbl">Kotak</div></div>
+        <div class="stat-card"><div class="stat-val" id="s-terisi">0</div><div class="stat-lbl">Terisi</div></div>
+        <div class="stat-card"><div class="stat-val" id="s-pct">0%</div><div class="stat-lbl">Utilisasi</div></div>
+      </div>
+    </div>
+    <div class="sb-section" style="flex:1;overflow:hidden;display:flex;flex-direction:column">
+      <div class="sb-title">Daftar Rak</div>
+      <div id="rack-list-wrap">
+        <div id="rack-list-items"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3D CANVAS -->
+  <div id="canvas-wrap">
+    <canvas id="c"></canvas>
+    <div id="view-hint">🖱 Klik: pilih &nbsp;|&nbsp; Drag kiri: putar &nbsp;|&nbsp; Drag kanan / Shift+drag: geser &nbsp;|&nbsp; Scroll: zoom &nbsp;|&nbsp; Sentuh 2 jari: pinch zoom</div>
+    <div id="search-highlight-badge">🔍 <span id="search-cnt">0</span> hasil ditemukan</div>
+
+    <!-- Directional pad -->
+    <div id="nav-pad">
+      <!-- Row 1: tilt up, rotate left, tilt up -->
+      <div class="nav-btn" onclick="cam.rotX=Math.max(-0.2,cam.rotX-0.08);draw()" title="Tilt atas">↑</div>
+      <div class="nav-btn" onclick="cam.rotX=Math.max(-0.2,cam.rotX-0.08);draw()">⬆</div>
+      <div class="nav-btn" onclick="cam.rotY-=0.1;draw()" title="Putar kiri">↺</div>
+      <!-- Row 2: pan left, reset, pan right -->
+      <div class="nav-btn" onclick="cam.panX-=20;draw()" title="Geser kiri">◀</div>
+      <div class="nav-btn center" onclick="resetView()" title="Reset view">⌂</div>
+      <div class="nav-btn" onclick="cam.panX+=20;draw()" title="Geser kanan">▶</div>
+      <!-- Row 3: tilt down, pan down, rotate right -->
+      <div class="nav-btn" onclick="cam.rotY+=0.1;draw()" title="Putar kanan">↻</div>
+      <div class="nav-btn" onclick="cam.rotX=Math.min(0.75,cam.rotX+0.08);draw()">⬇</div>
+      <div class="nav-btn" onclick="cam.rotX=Math.min(0.75,cam.rotX+0.08);draw()" title="Tilt bawah">↓</div>
+    </div>
+
+    <div id="zoom-bar">
+      <div class="zoom-btn" onclick="cam.dist=Math.min(3.5,cam.dist*1.2);draw()">＋</div>
+      <div class="zoom-btn" style="font-size:11px;font-weight:400" id="zoom-label">100%</div>
+      <div class="zoom-btn" onclick="cam.dist=Math.max(0.2,cam.dist*0.83);draw()">－</div>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div id="panel-right">
+    <div id="panel-header">Detail</div>
+    <div id="panel-body">
+      <div class="p-empty">
+        <div class="p-empty-icon">📦</div>
+        Klik rak atau kotak<br>untuk melihat detail
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ DESIGNER PANEL ══ -->
+<div id="designer-panel">
+  <div id="dp-header">
+    <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+      <path d="M3 6h14M3 10h14M3 14h8" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round"/>
+    </svg>
+    <h2>Desainer Rak</h2>
+    <div style="margin-left:auto;display:flex;gap:8px">
+      <button class="dp-btn ghost" onclick="switchTab('view', document.querySelector('.tab'))">✕ Tutup</button>
+    </div>
+  </div>
+  <div id="dp-body">
+    <!-- Rack list -->
+    <div id="dp-rack-list">
+      <div id="dp-rack-items"></div>
+      <div class="dp-add-rack" onclick="addNewRack()">＋ Tambah Rak Baru</div>
+    </div>
+    <!-- Editor -->
+    <div id="dp-editor">
+      <div id="dp-no-sel" style="color:var(--t3);font-size:13px;text-align:center;padding:40px 0">
+        Pilih rak di sebelah kiri untuk diedit
+      </div>
+      <div id="dp-form" style="display:none">
+        <div class="dp-section">
+          <div class="dp-section-title">Informasi Rak</div>
+          <div class="dp-row">
+            <div class="dp-field"><label>Nama Rak</label><input class="dp-input" id="dp-name" placeholder="Rak A"></div>
+            <div class="dp-field"><label>Kode / ID</label><input class="dp-input" id="dp-code" placeholder="A"></div>
+          </div>
+          <div class="dp-row">
+            <div class="dp-field"><label>Jumlah Baris</label><input class="dp-input" id="dp-rows" type="number" min="1" max="10" value="3" oninput="refreshPreview()"></div>
+            <div class="dp-field"><label>Jumlah Kolom</label><input class="dp-input" id="dp-cols" type="number" min="1" max="12" value="4" oninput="refreshPreview()"></div>
+          </div>
+        </div>
+
+        <div class="dp-section">
+          <div class="dp-section-title">Posisi di Gudang (Grid)</div>
+          <div class="dp-pos">
+            <div class="dp-field"><label>Kolom (X)</label><input class="dp-input" id="dp-gx" type="number" min="0" value="0"></div>
+            <div class="dp-field"><label>Baris (Z)</label><input class="dp-input" id="dp-gz" type="number" min="0" value="0"></div>
+          </div>
+        </div>
+
+        <div class="dp-section">
+          <div class="dp-section-title">Warna Rak</div>
+          <div class="swatch-row" id="swatch-row"></div>
+        </div>
+
+        <div class="dp-section">
+          <div class="dp-section-title">Preview Tata Letak</div>
+          <div id="dp-preview-wrap">
+            <div id="dp-preview-title">Preview Rak</div>
+            <div id="dp-grid"></div>
+          </div>
+        </div>
+
+        <div class="dp-actions">
+          <button class="dp-btn primary" onclick="saveRack()">💾 Simpan Rak</button>
+          <button class="dp-btn danger" onclick="deleteRack()">🗑 Hapus Rak</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ ITEM MODAL ══ -->
+<div id="modal-overlay">
+  <div id="modal-box">
+    <h3 id="modal-title">Tambah Sparepart</h3>
+    <div class="m-field"><label>Nama Sparepart *</label><input class="m-input" id="f-name" placeholder="Contoh: Bearing 6203"></div>
+    <div class="m-row">
+      <div class="m-field"><label>Nomor Part</label><input class="m-input" id="f-part" placeholder="BRG-6203-2RS"></div>
+      <div class="m-field"><label>Kategori</label>
+        <select class="m-select" id="f-cat">
+          <option value="Bearing">Bearing</option>
+          <option value="Belt">Belt / V-Belt</option>
+          <option value="Seal">Seal / O-Ring</option>
+          <option value="Filter">Filter</option>
+          <option value="Elektrik">Elektrik</option>
+          <option value="Hidrolik">Hidrolik</option>
+          <option value="Pneumatik">Pneumatik</option>
+          <option value="Fastener">Fastener</option>
+          <option value="Lainnya">Lainnya</option>
+        </select>
+      </div>
+    </div>
+    <div class="m-row">
+      <div class="m-field"><label>Stok (pcs)</label><input class="m-input" id="f-qty" type="number" min="0" value="1"></div>
+      <div class="m-field"><label>Min. Stok</label><input class="m-input" id="f-minqty" type="number" min="0" value="2"></div>
+    </div>
+    <div class="m-field"><label>Lokasi</label><input class="m-input" id="f-loc" readonly></div>
+    <div class="m-field"><label>Keterangan</label><textarea class="m-textarea" id="f-note" placeholder="Spesifikasi, merek, catatan..."></textarea></div>
+    <div class="m-footer">
+      <button class="m-btn cancel" onclick="closeModal()">Batal</button>
+      <button class="m-btn save" onclick="saveItem()">💾 Simpan</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+'use strict';
+// ============================================================
+//  CATEGORY CONFIG
+// ============================================================
+const CATS = {
+  'Bearing':   { color:'#4a9fd4', bg:'rgba(74,159,212,0.2)' },
+  'Belt':      { color:'#e8a020', bg:'rgba(232,160,32,0.2)' },
+  'Seal':      { color:'#3db87a', bg:'rgba(61,184,122,0.2)' },
+  'Filter':    { color:'#e05555', bg:'rgba(224,85,85,0.2)' },
+  'Elektrik':  { color:'#9b7de8', bg:'rgba(155,125,232,0.2)' },
+  'Hidrolik':  { color:'#56b86e', bg:'rgba(86,184,110,0.2)' },
+  'Pneumatik': { color:'#d4906a', bg:'rgba(212,144,106,0.2)' },
+  'Fastener':  { color:'#b87a5a', bg:'rgba(184,122,90,0.2)' },
+  'Lainnya':   { color:'#888780', bg:'rgba(136,135,128,0.2)' },
+};
+
+const RACK_COLORS = [
+  '#e8a020','#4a9fd4','#3db87a','#e05555','#9b7de8',
+  '#d4906a','#56b86e','#b87a5a','#c0c0b0','#708090'
+];
+
+// ============================================================
+//  DATA
+// ============================================================
+const RAK_LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+let racks = [];   // { id, name, code, rows, cols, gx, gz, color }
+let items = {};   // key: "rackId-row-col"
+
+function initData(){
+  const configs = [
+    {rows:3,cols:4,gx:0,gz:0},{rows:2,cols:5,gx:1,gz:0},{rows:4,cols:3,gx:2,gz:0},{rows:3,cols:3,gx:3,gz:0},{rows:2,cols:6,gx:4,gz:0},
+    {rows:5,cols:2,gx:0,gz:1},{rows:3,cols:4,gx:1,gz:1},{rows:2,cols:5,gx:2,gz:1},{rows:4,cols:3,gx:3,gz:1},{rows:3,cols:4,gx:4,gz:1},
+    {rows:2,cols:4,gx:0,gz:2},{rows:3,cols:5,gx:1,gz:2},{rows:4,cols:2,gx:2,gz:2},{rows:2,cols:6,gx:3,gz:2},{rows:3,cols:3,gx:4,gz:2},
+    {rows:5,cols:3,gx:0,gz:3},{rows:2,cols:4,gx:1,gz:3},{rows:3,cols:4,gx:2,gz:3},{rows:4,cols:3,gx:3,gz:3},{rows:3,cols:5,gx:4,gz:3},
+    {rows:2,cols:5,gx:0,gz:4},{rows:3,cols:3,gx:1,gz:4},{rows:4,cols:4,gx:2,gz:4},{rows:2,cols:6,gx:3,gz:4},{rows:3,cols:4,gx:4,gz:4},
+  ];
+  configs.forEach((c, i) => {
+    racks.push({ id: i, name: 'Rak ' + RAK_LETTERS[i], code: RAK_LETTERS[i],
+      rows: c.rows, cols: c.cols, gx: c.gx, gz: c.gz,
+      color: RACK_COLORS[i % RACK_COLORS.length] });
+  });
+
+  const SAMPLE = [
+    {name:'Bearing 6203',part:'BRG-6203-2RS',cat:'Bearing',qty:12,minqty:3,note:'Deep groove'},
+    {name:'V-Belt A52',part:'VBL-A52',cat:'Belt',qty:5,minqty:2,note:''},
+    {name:'Oil Seal 40x60',part:'OSL-40-60-10',cat:'Seal',qty:8,minqty:4,note:'NBR'},
+    {name:'Filter Oli',part:'FLT-OIL-001',cat:'Filter',qty:3,minqty:5,note:'250jam'},
+    {name:'Kontaktor 3P',part:'KTR-3P-25A',cat:'Elektrik',qty:6,minqty:2,note:'25A'},
+    {name:'Bearing 6205',part:'BRG-6205-ZZ',cat:'Bearing',qty:15,minqty:3,note:''},
+    {name:'Hydraulic Seal',part:'HSL-50-70',cat:'Hidrolik',qty:4,minqty:2,note:''},
+    {name:'Fitting 8mm',part:'FTG-PNM-8',cat:'Pneumatik',qty:20,minqty:5,note:'Push-in'},
+    {name:'Baut M10x30',part:'BLT-M10-30',cat:'Fastener',qty:100,minqty:20,note:'G8.8'},
+    {name:'V-Belt B62',part:'VBL-B62',cat:'Belt',qty:3,minqty:2,note:''},
+    {name:'Seal Ring 30',part:'SRG-30',cat:'Seal',qty:10,minqty:4,note:''},
+    {name:'Filter Udara',part:'FLT-AIR-002',cat:'Filter',qty:2,minqty:3,note:''},
+    {name:'Relay 24VDC',part:'RLY-24V-10A',cat:'Elektrik',qty:8,minqty:2,note:'SPDT'},
+    {name:'Bearing 6001',part:'BRG-6001-Z',cat:'Bearing',qty:10,minqty:3,note:''},
+    {name:'Cylinder Seal',part:'CSL-63-80',cat:'Hidrolik',qty:6,minqty:2,note:'Piston'},
+    {name:'Klem Pipa 1/2',part:'KLM-PP-12',cat:'Fastener',qty:50,minqty:10,note:'SS304'},
+    {name:'Bearing 6207',part:'BRG-6207-2RS',cat:'Bearing',qty:7,minqty:3,note:''},
+    {name:'Solenoid Valve',part:'SLV-5/2-24V',cat:'Pneumatik',qty:3,minqty:2,note:'5/2'},
+    {name:'Coupling Spider',part:'CPL-SPD-28',cat:'Lainnya',qty:5,minqty:2,note:'PU'},
+    {name:'Mur M12',part:'NUT-M12',cat:'Fastener',qty:200,minqty:30,note:'Galvanis'},
+    {name:'Bearing 6304',part:'BRG-6304-2Z',cat:'Bearing',qty:8,minqty:3,note:''},
+    {name:'Valve Hidrolik',part:'VLV-HYD-P80',cat:'Hidrolik',qty:2,minqty:1,note:'80bar'},
+    {name:'Timer Relay',part:'TMR-RLY-230',cat:'Elektrik',qty:4,minqty:2,note:'230V'},
+    {name:'Selang PU 6mm',part:'HOS-PNM-6',cat:'Pneumatik',qty:10,minqty:3,note:''},
+    {name:'Bearing 6006',part:'BRG-6006-2RS',cat:'Bearing',qty:6,minqty:2,note:''},
+  ];
+
+  let placed = 0;
+  for(let i = 0; i < racks.length && placed < SAMPLE.length; i++){
+    let r = racks[i];
+    for(let row = 0; row < r.rows && placed < SAMPLE.length; row++){
+      for(let col = 0; col < r.cols && placed < SAMPLE.length; col++){
+        if(Math.random() > 0.28){
+          let key = `${i}-${row}-${col}`;
+          items[key] = { ...SAMPLE[placed], rack: i, row, col, id: key };
+          placed++;
+        }
+      }
+    }
+  }
+}
+initData();
+
+// ============================================================
+//  3D CAMERA + RENDERER
+// ============================================================
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+let W = 0, H = 0;
+
+// cam: rotY=horizontal rotation, rotX=vertical tilt, dist=zoom
+//      panX=lateral pan, panY=vertical pan
+let cam = { rotY: 0.42, rotX: 0.32, dist: 0.92, panX: 0, panY: 40 };
+
+// Drag state — supports left (rotate) and right/shift (pan)
+let drag = { on: false, btn: 0, sx: 0, sy: 0,
+             rotY0: 0, rotX0: 0, panX0: 0, panY0: 0 };
+
+let highlighted = null, selected = null, searchHit = new Set();
+let autoRotate = false, arRAF = null;
+
+// Geometry constants
+const CW = 40, CH = 24, CD = 30, CGAP = 5;
+const SHELF_H = 5, BASE_H = 10;
+const GX_STEP = 280, GZ_STEP = 200;   // world-space grid spacing
+
+function getRackWorld(rack){
+  return {
+    x: rack.gx * GX_STEP,
+    z: rack.gz * GZ_STEP,
+    w: rack.cols * (CW + CGAP),
+    h: rack.rows * (CH + SHELF_H) + BASE_H,
+    d: CD + 10,
+  };
+}
+
+function proj(x, y, z){
+  // Horizontal yaw
+  let cy = Math.cos(cam.rotY), sy = Math.sin(cam.rotY);
+  let rx = cy*x + sy*z;
+  let rz = -sy*x + cy*z;
+  // Vertical pitch
+  let cx = Math.cos(cam.rotX), sx = Math.sin(cam.rotX);
+  let ry = cx*y + sx*rz;
+  let rz2 = cx*rz - sx*y;
+  let sc = cam.dist * 360 / (rz2 + 450);
+  return { px: rx*sc + W/2 + cam.panX,
+           py: -ry*sc + H/2 + cam.panY,
+           sc, rz: rz2 };
+}
+
+function face(pts, fill, stroke, sw){
+  ctx.beginPath();
+  ctx.moveTo(pts[0].px, pts[0].py);
+  for(let i = 1; i < pts.length; i++) ctx.lineTo(pts[i].px, pts[i].py);
+  ctx.closePath();
+  if(fill){ ctx.fillStyle = fill; ctx.fill(); }
+  if(stroke){ ctx.strokeStyle = stroke; ctx.lineWidth = sw || 0.5; ctx.stroke(); }
+}
+
+function hexAlpha(hex, a){
+  let r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+  return `rgba(${r},${g},${b},${a})`;
+}
+
+let hitBoxes = [];
+
+function draw(){
+  W = canvas.offsetWidth; H = canvas.offsetHeight;
+  canvas.width  = Math.round(W * devicePixelRatio);
+  canvas.height = Math.round(H * devicePixelRatio);
+  ctx.scale(devicePixelRatio, devicePixelRatio);
+  ctx.clearRect(0, 0, W, H);
+  hitBoxes = [];
+
+  drawFloorGrid();
+
+  // Painter's sort
+  let sorted = [...racks].sort((a, b) => {
+    let wa = getRackWorld(a), wb = getRackWorld(b);
+    let da = proj(wa.x + wa.w/2, 0, wa.z + wa.d/2).rz;
+    let db = proj(wb.x + wb.w/2, 0, wb.z + wb.d/2).rz;
+    return da - db;
+  });
+  for(let r of sorted) drawRack(r);
+
+  // Update zoom label
+  document.getElementById('zoom-label').textContent = Math.round(cam.dist * 100) + '%';
+}
+
+function drawFloorGrid(){
+  ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+  ctx.lineWidth = 0.5;
+  let maxX = 5 * GX_STEP, maxZ = 5 * GZ_STEP;
+  for(let x = -50; x <= maxX+50; x += GX_STEP/2){
+    let p0 = proj(x, -1, -50), p1 = proj(x, -1, maxZ+50);
+    ctx.beginPath(); ctx.moveTo(p0.px, p0.py); ctx.lineTo(p1.px, p1.py); ctx.stroke();
+  }
+  for(let z = -50; z <= maxZ+50; z += GZ_STEP/2){
+    let p0 = proj(-50, -1, z), p1 = proj(maxX+50, -1, z);
+    ctx.beginPath(); ctx.moveTo(p0.px, p0.py); ctx.lineTo(p1.px, p1.py); ctx.stroke();
+  }
+}
+
+function drawRack(rack){
+  let pos = getRackWorld(rack);
+  let { x, z, w, h, d } = pos;
+  let rColor = rack.color || '#e8a020';
+
+  let isSelRack = selected && selected.type === 'rack' && selected.id === rack.id;
+  let isHovRack = highlighted && highlighted.type === 'rack' && highlighted.id === rack.id;
+
+  // Floor shadow
+  let sh = [proj(x-3,-1,z-3),proj(x+w+3,-1,z-3),proj(x+w+3,-1,z+d+3),proj(x-3,-1,z+d+3)];
+  face(sh, 'rgba(0,0,0,0.35)', null);
+
+  // Base slab
+  let b  = [proj(x,0,z),proj(x+w,0,z),proj(x+w,0,z+d),proj(x,0,z+d)];
+  let bt = [proj(x,BASE_H,z),proj(x+w,BASE_H,z),proj(x+w,BASE_H,z+d),proj(x,BASE_H,z+d)];
+  let darkBase = hexAlpha(rColor, 0.25);
+  face([b[3],b[2],bt[2],bt[3]], darkBase, 'rgba(255,255,255,0.06)');
+  face([bt[0],bt[1],bt[2],bt[3]], hexAlpha(rColor,0.18), 'rgba(255,255,255,0.06)');
+
+  // Vertical posts
+  for(let c = 0; c <= rack.cols; c++){
+    let px = x + c * (CW + CGAP);
+    let pf0 = proj(px,0,z), pf1 = proj(px,h+4,z);
+    let pb0 = proj(px,0,z+d), pb1 = proj(px,h+4,z+d);
+    ctx.beginPath(); ctx.moveTo(pf0.px,pf0.py); ctx.lineTo(pf1.px,pf1.py);
+    ctx.strokeStyle = hexAlpha(rColor,0.5); ctx.lineWidth = 1.5; ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(pb0.px,pb0.py); ctx.lineTo(pb1.px,pb1.py);
+    ctx.strokeStyle = hexAlpha(rColor,0.2); ctx.lineWidth = 0.5; ctx.stroke();
+  }
+
+  // Rows
+  for(let row = 0; row < rack.rows; row++){
+    let yBase = BASE_H + row * (CH + SHELF_H);
+    let yTop  = yBase + CH;
+
+    // Shelf plank
+    let sf  = [proj(x,yTop,z),proj(x+w,yTop,z),proj(x+w,yTop,z+d),proj(x,yTop,z+d)];
+    let sfr = [proj(x,yTop+SHELF_H,z),proj(x+w,yTop+SHELF_H,z),proj(x+w,yTop+SHELF_H,z+d),proj(x,yTop+SHELF_H,z+d)];
+    face([sf[0],sf[1],sfr[1],sfr[0]], hexAlpha(rColor,0.3), hexAlpha(rColor,0.4));
+    face([sf[0],sf[1],sf[2],sf[3]], hexAlpha(rColor,0.2), hexAlpha(rColor,0.3));
+
+    for(let col = 0; col < rack.cols; col++){
+      drawCell(rack, row, col, x + col*(CW+CGAP), yBase, z, rColor);
+    }
+  }
+
+  // Rack name label
+  let labelY = h + 12;
+  let lt = proj(x, labelY, z), rt2 = proj(x+w, labelY, z);
+  let mx = (lt.px+rt2.px)/2, my = (lt.py+rt2.py)/2;
+  let sc = (lt.sc+rt2.sc)/2;
+  let fs = Math.max(9, Math.min(14, sc*12));
+  ctx.font = `700 ${fs}px 'Segoe UI',system-ui,sans-serif`;
+  ctx.textAlign = 'center';
+  // Glow
+  ctx.shadowColor = rColor; ctx.shadowBlur = 6;
+  ctx.fillStyle = rColor;
+  ctx.fillText(rack.name, mx, my);
+  ctx.shadowBlur = 0;
+
+  // Rack hitbox
+  hitBoxes.push({
+    type:'rack', id: rack.id,
+    x0: Math.min(lt.px,rt2.px)-4, y0: Math.min(lt.py,rt2.py)-fs-4,
+    x1: Math.max(lt.px,rt2.px)+4, y1: Math.max(lt.py,rt2.py)+4
+  });
+
+  // Selection outline
+  if(isSelRack || isHovRack){
+    let corners = [proj(x-2,0,z-2),proj(x+w+2,0,z-2),proj(x+w+2,h+14,z-2),proj(x-2,h+14,z-2)];
+    face(corners, null, isSelRack ? rColor : 'rgba(255,255,255,0.3)', isSelRack ? 2 : 1);
+  }
+}
+
+function drawCell(rack, row, col, cx, cy, cz, rColor){
+  let key = `${rack.id}-${row}-${col}`;
+  let item = items[key];
+  let isSel = selected && selected.type === 'cell' && selected.key === key;
+  let isHov = highlighted && highlighted.type === 'cell' && highlighted.key === key;
+  let isHit = searchHit.has(key);
+  let isLow = item && item.qty <= (item.minqty || 0);
+
+  let catInfo = item ? (CATS[item.cat] || CATS['Lainnya']) : null;
+
+  let fillFront, strokeFront, sw;
+  if(item){
+    fillFront = catInfo.bg;
+    strokeFront = catInfo.color + '60';
+    sw = 0.5;
+  } else {
+    fillFront = 'rgba(255,255,255,0.03)';
+    strokeFront = 'rgba(255,255,255,0.06)';
+    sw = 0.5;
+  }
+  if(isHit)  { fillFront = 'rgba(232,160,32,0.22)'; strokeFront = '#e8a020'; sw = 1.5; }
+  if(isSel)  { fillFront = 'rgba(74,159,212,0.28)'; strokeFront = '#4a9fd4'; sw = 2; }
+  if(isHov && !isSel) { fillFront = 'rgba(255,255,255,0.08)'; strokeFront = 'rgba(255,255,255,0.25)'; sw = 1; }
+
+  let p = [
+    proj(cx,    cy,    cz),    // 0 front-bottom-left
+    proj(cx+CW, cy,    cz),    // 1 front-bottom-right
+    proj(cx+CW, cy+CH, cz),    // 2 front-top-right
+    proj(cx,    cy+CH, cz),    // 3 front-top-left
+    proj(cx,    cy+CH, cz+CD), // 4 back-top-left
+    proj(cx+CW, cy+CH, cz+CD), // 5 back-top-right
+    proj(cx+CW, cy,    cz+CD), // 6 back-bottom-right
+    proj(cx,    cy,    cz+CD), // 7 back-bottom-left
+  ];
+
+  // Side face
+  face([p[3],p[2],p[5],p[4]], 'rgba(255,255,255,0.03)', 'rgba(255,255,255,0.04)');
+  // Top face
+  face([p[7],p[6],p[1],p[0]], 'rgba(255,255,255,0.025)', 'rgba(255,255,255,0.04)');
+  // Front face
+  face([p[0],p[1],p[2],p[3]], fillFront, strokeFront, sw);
+
+  // Low-stock indicator
+  if(isLow && !isSel){
+    let lx = Math.min(p[0].px,p[1].px), lw = Math.abs(p[1].px-p[0].px);
+    let ly = (p[0].py+p[3].py)/2;
+    ctx.fillStyle = 'rgba(224,85,85,0.7)';
+    ctx.fillRect(lx, ly-1, lw, 2);
+  }
+
+  // Label
+  let mx = (p[0].px+p[1].px+p[2].px+p[3].px)/4;
+  let my = (p[0].py+p[1].py+p[2].py+p[3].py)/4;
+  let sc = (p[0].sc+p[1].sc)/2;
+  let fs = Math.max(5, Math.min(9, sc*8));
+  ctx.font = `${item?'600':'400'} ${fs}px 'Segoe UI',system-ui,sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.shadowBlur = 0;
+  if(item){
+    ctx.fillStyle = isSel ? '#4a9fd4' : isHit ? '#e8a020' : catInfo.color;
+    let lbl = item.name.length > 10 ? item.name.slice(0,10)+'…' : item.name;
+    ctx.fillText(lbl, mx, my + fs*0.35);
+  } else {
+    ctx.fillStyle = 'rgba(255,255,255,0.12)';
+    ctx.fillText('—', mx, my + fs*0.35);
+  }
+
+  // Hitbox
+  let xs = p.slice(0,4).map(q=>q.px), ys = p.slice(0,4).map(q=>q.py);
+  hitBoxes.push({
+    type:'cell', key, rackId: rack.id, row, col,
+    x0: Math.min(...xs)-2, y0: Math.min(...ys)-2,
+    x1: Math.max(...xs)+2, y1: Math.max(...ys)+2
+  });
+}
+
+// ============================================================
+//  MOUSE / TOUCH INPUT
+// ============================================================
+function getCanvasPt(e){
+  let rect = canvas.getBoundingClientRect();
+  return {
+    x: (e.clientX - rect.left) * W / rect.width,
+    y: (e.clientY - rect.top)  * H / rect.height
+  };
+}
+
+function getHit(mx, my){
+  // cells take priority
+  for(let i = hitBoxes.length-1; i >= 0; i--){
+    let h = hitBoxes[i];
+    if(h.type==='cell' && mx>=h.x0&&mx<=h.x1&&my>=h.y0&&my<=h.y1) return h;
+  }
+  for(let i = hitBoxes.length-1; i >= 0; i--){
+    let h = hitBoxes[i];
+    if(h.type==='rack' && mx>=h.x0&&mx<=h.x1&&my>=h.y0&&my<=h.y1) return h;
+  }
+  return null;
+}
+
+canvas.addEventListener('contextmenu', e => e.preventDefault());
+
+canvas.addEventListener('mousedown', e => {
+  drag.on = true;
+  drag.btn = e.button;
+  drag.sx = e.clientX; drag.sy = e.clientY;
+  drag.rotY0 = cam.rotY; drag.rotX0 = cam.rotX;
+  drag.panX0 = cam.panX; drag.panY0 = cam.panY;
+  e.preventDefault();
+});
+
+canvas.addEventListener('mousemove', e => {
+  if(drag.on){
+    let dx = e.clientX - drag.sx, dy = e.clientY - drag.sy;
+    if(drag.btn === 2 || e.shiftKey){
+      // PAN (right button OR shift+drag)
+      cam.panX = drag.panX0 + dx;
+      cam.panY = drag.panY0 + dy;
+    } else {
+      // ROTATE (left button)
+      cam.rotY = drag.rotY0 + dx * 0.006;
+      cam.rotX = Math.max(-0.2, Math.min(0.78, drag.rotX0 + dy * 0.006));
+    }
+    draw(); return;
+  }
+  let pt = getCanvasPt(e);
+  let h = getHit(pt.x, pt.y);
+  highlighted = h;
+  canvas.style.cursor = h ? 'pointer' : 'grab';
+  if(h !== highlighted) draw();
+  draw();
+});
+
+canvas.addEventListener('mouseup', e => {
+  let moved = Math.abs(e.clientX-drag.sx)+Math.abs(e.clientY-drag.sy);
+  drag.on = false;
+  if(moved < 5 && e.button === 0){
+    let pt = getCanvasPt(e);
+    let h = getHit(pt.x, pt.y);
+    if(h){ selected = h; showPanel(h); }
+    else { selected = null; clearPanel(); }
+    draw();
+  }
+});
+canvas.addEventListener('mouseleave', ()=>{ drag.on=false; });
+
+canvas.addEventListener('wheel', e => {
+  e.preventDefault();
+  // Ctrl+wheel or standard: zoom
+  cam.dist = Math.max(0.2, Math.min(3.5, cam.dist * (e.deltaY>0?0.88:1.14)));
+  draw();
+}, { passive:false });
+
+// Touch
+let touch0 = null, touchDist0 = null, touchCam0 = null;
+canvas.addEventListener('touchstart', e => {
+  e.preventDefault();
+  if(e.touches.length === 1){
+    let t = e.touches[0];
+    drag.on=true; drag.btn=0;
+    drag.sx=t.clientX; drag.sy=t.clientY;
+    drag.rotY0=cam.rotY; drag.rotX0=cam.rotX;
+    drag.panX0=cam.panX; drag.panY0=cam.panY;
+    touch0={x:t.clientX,y:t.clientY};
+    touchDist0=null; touchCam0=null;
+  } else if(e.touches.length === 2){
+    drag.on=false;
+    let dx=e.touches[0].clientX-e.touches[1].clientX;
+    let dy=e.touches[0].clientY-e.touches[1].clientY;
+    touchDist0=Math.sqrt(dx*dx+dy*dy);
+    touchCam0={...cam};
+  }
+},{passive:false});
+
+canvas.addEventListener('touchmove', e => {
+  e.preventDefault();
+  if(e.touches.length===1 && drag.on){
+    let t=e.touches[0];
+    let dx=t.clientX-drag.sx, dy=t.clientY-drag.sy;
+    // 2-finger not active: check if shift-ish (from slow movement => pan)
+    cam.rotY=drag.rotY0+dx*0.006;
+    cam.rotX=Math.max(-0.2,Math.min(0.78,drag.rotX0+dy*0.006));
+    draw();
+  } else if(e.touches.length===2 && touchDist0!==null){
+    let dx=e.touches[0].clientX-e.touches[1].clientX;
+    let dy=e.touches[0].clientY-e.touches[1].clientY;
+    let dist=Math.sqrt(dx*dx+dy*dy);
+    cam.dist=Math.max(0.2,Math.min(3.5,touchCam0.dist*(dist/touchDist0)));
+    // pan from midpoint
+    let mx0=(e.touches[0].clientX+e.touches[1].clientX)/2;
+    let my0=(e.touches[0].clientY+e.touches[1].clientY)/2;
+    draw();
+  }
+},{passive:false});
+canvas.addEventListener('touchend', e=>{
+  let moved = touch0 ? Math.abs(e.changedTouches[0].clientX-touch0.x)+Math.abs(e.changedTouches[0].clientY-touch0.y) : 99;
+  drag.on=false; touchDist0=null;
+  if(moved < 8 && e.changedTouches.length===1){
+    let t=e.changedTouches[0];
+    let rect=canvas.getBoundingClientRect();
+    let pt={x:(t.clientX-rect.left)*W/rect.width, y:(t.clientY-rect.top)*H/rect.height};
+    let h=getHit(pt.x,pt.y);
+    if(h){selected=h;showPanel(h);}
+    else{selected=null;clearPanel();}
+    draw();
+  }
+},{passive:false});
+
+function resetView(){
+  cam={rotY:0.42,rotX:0.32,dist:0.92,panX:0,panY:40};
+  selected=null; highlighted=null; searchHit.clear();
+  document.getElementById('search-input').value='';
+  clearPanel(); draw();
+  document.getElementById('search-highlight-badge').style.display='none';
+}
+
+function toggleAutoRotate(){
+  autoRotate=!autoRotate;
+  document.getElementById('btn-ar').textContent = autoRotate ? '⏹ Stop' : '▶ Auto';
+  if(autoRotate)(function loop(){ if(!autoRotate)return; cam.rotY+=0.005; draw(); arRAF=requestAnimationFrame(loop); })();
+  else cancelAnimationFrame(arRAF);
+}
+
+// Keyboard shortcuts
+document.addEventListener('keydown', e => {
+  if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'||e.target.tagName==='SELECT') return;
+  const STEP=15;
+  if(e.key==='ArrowLeft') { cam.rotY-=0.08; draw(); }
+  else if(e.key==='ArrowRight') { cam.rotY+=0.08; draw(); }
+  else if(e.key==='ArrowUp' && !e.shiftKey) { cam.rotX=Math.max(-0.2,cam.rotX-0.06); draw(); }
+  else if(e.key==='ArrowDown' && !e.shiftKey) { cam.rotX=Math.min(0.78,cam.rotX+0.06); draw(); }
+  else if(e.key==='ArrowLeft' && e.shiftKey) { cam.panX-=STEP; draw(); }
+  else if(e.key==='ArrowRight' && e.shiftKey) { cam.panX+=STEP; draw(); }
+  else if(e.key==='Escape') { closeModal(); }
+  else if(e.key==='+') { cam.dist=Math.min(3.5,cam.dist*1.12); draw(); }
+  else if(e.key==='-') { cam.dist=Math.max(0.2,cam.dist*0.89); draw(); }
+  else if(e.key==='r'||e.key==='R') resetView();
+});
+
+// ============================================================
+//  PANEL
+// ============================================================
+function rackById(id){ return racks.find(r=>r.id===id); }
+
+function showPanel(hit){
+  let ph = document.getElementById('panel-header');
+  let pb = document.getElementById('panel-body');
+
+  if(hit.type==='rack'){
+    let rack = rackById(hit.id); if(!rack) return;
+    let total=rack.rows*rack.cols;
+    let filled=Object.values(items).filter(i=>i.rack===rack.id).length;
+    let pct=Math.round(filled/total*100);
+    ph.textContent = rack.name;
+    pb.innerHTML=`
+      <div class="p-loc">
+        <span class="p-loc-icon">🏭</span>
+        <span class="p-loc-text">Grid: Kolom ${rack.gx+1}, Baris ${rack.gz+1}</span>
+      </div>
+      <div class="p-row"><span class="p-lbl">Layout</span><span class="p-val">${rack.rows} × ${rack.cols}</span></div>
+      <div class="p-row"><span class="p-lbl">Total Kotak</span><span class="p-val">${total}</span></div>
+      <div class="p-row"><span class="p-lbl">Terisi</span><span class="p-val">${filled}</span></div>
+      <div class="p-row"><span class="p-lbl">Kosong</span><span class="p-val">${total-filled}</span></div>
+      <div class="p-row"><span class="p-lbl">Utilisasi</span>
+        <span class="p-val"><span style="color:${pct>80?'var(--red)':pct>50?'var(--accent)':'var(--green)'}">${pct}%</span></span>
+      </div>
+      <div class="p-actions">
+        <button class="p-btn primary" onclick="openAddModal(${rack.id},null)">＋ Tambah di ${rack.name}</button>
+        <button class="p-btn" onclick="editRackInDesigner(${rack.id})">🔧 Edit Desain Rak</button>
+      </div>`;
+
+    // Highlight rack in list
+    document.querySelectorAll('.rack-item').forEach(el=>{
+      el.classList.toggle('active', parseInt(el.dataset.id)===rack.id);
+    });
+  } else {
+    let key=hit.key, item=items[key];
+    let rack=rackById(hit.rackId); if(!rack) return;
+    ph.textContent = `${rack.name} · R${hit.row+1} · K${hit.col+1}`;
+    if(item){
+      let cat=CATS[item.cat]||CATS['Lainnya'];
+      let isLow=item.qty<=(item.minqty||0);
+      pb.innerHTML=`
+        ${isLow?`<div class="warn-box">⚠ Stok menipis! Segera restock.</div>`:''}
+        <div class="p-loc">
+          <span class="p-loc-icon">📍</span>
+          <span class="p-loc-text">${rack.name}-R${hit.row+1}-K${hit.col+1}</span>
+        </div>
+        <div class="p-row"><span class="p-lbl">Nama</span><span class="p-val">${item.name}</span></div>
+        <div class="p-row"><span class="p-lbl">Nomor Part</span><span class="p-val p-mono">${item.part||'-'}</span></div>
+        <div class="p-row"><span class="p-lbl">Kategori</span>
+          <span class="p-val"><span class="p-badge" style="background:${cat.bg};color:${cat.color}">${item.cat}</span></span>
+        </div>
+        <div class="p-row"><span class="p-lbl">Stok</span>
+          <span class="p-val" style="color:${isLow?'var(--red)':'var(--t1)'};font-weight:700">${item.qty} pcs</span>
+        </div>
+        <div class="p-row"><span class="p-lbl">Min. Stok</span><span class="p-val">${item.minqty||0} pcs</span></div>
+        ${item.note?`<div class="p-row"><span class="p-lbl">Ket.</span><span class="p-val">${item.note}</span></div>`:''}
+        <div class="p-actions">
+          <button class="p-btn primary" onclick="openEditModal('${key}')">✏ Edit Item</button>
+          <button class="p-btn danger" onclick="deleteItem('${key}')">🗑 Hapus</button>
+        </div>`;
+    } else {
+      pb.innerHTML=`
+        <div class="p-loc">
+          <span class="p-loc-icon">📍</span>
+          <span class="p-loc-text">${rack.name}-R${hit.row+1}-K${hit.col+1}</span>
+        </div>
+        <div class="p-empty" style="padding:16px 0">Kotak kosong</div>
+        <div class="p-actions">
+          <button class="p-btn primary" onclick="openAddModal(${hit.rackId},'${key}')">＋ Tambah di sini</button>
+        </div>`;
+    }
+  }
+}
+
+function clearPanel(){
+  document.getElementById('panel-header').textContent='Detail';
+  document.getElementById('panel-body').innerHTML=`
+    <div class="p-empty"><div class="p-empty-icon">📦</div>Klik rak atau kotak<br>untuk melihat detail</div>`;
+  document.querySelectorAll('.rack-item').forEach(el=>el.classList.remove('active'));
+}
+
+// ============================================================
+//  SEARCH & FILTER
+// ============================================================
+function onSearch(q){
+  searchHit.clear();
+  let badge=document.getElementById('search-highlight-badge');
+  if(!q.trim()){ badge.style.display='none'; draw(); return; }
+  q=q.toLowerCase();
+  for(let [k,it] of Object.entries(items)){
+    let r=rackById(it.rack);
+    if(it.name.toLowerCase().includes(q)||(it.part&&it.part.toLowerCase().includes(q))||
+       (r&&r.name.toLowerCase().includes(q))||(it.cat&&it.cat.toLowerCase().includes(q))){
+      searchHit.add(k);
+    }
+  }
+  badge.style.display='block';
+  document.getElementById('search-cnt').textContent=searchHit.size;
+  draw();
+}
+
+let activeCat='all';
+function filterCat(cat, el){
+  activeCat=cat;
+  document.querySelectorAll('.cat-item').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  searchHit.clear();
+  if(cat!=='all') Object.entries(items).forEach(([k,it])=>{ if(it.cat===cat)searchHit.add(k); });
+  let badge=document.getElementById('search-highlight-badge');
+  if(cat!=='all'){ badge.style.display='block'; document.getElementById('search-cnt').textContent=searchHit.size; }
+  else badge.style.display='none';
+  draw();
+}
+
+// ============================================================
+//  SIDEBAR UPDATES
+// ============================================================
+function refreshSidebar(){
+  // Categories
+  let catCounts={};
+  Object.values(items).forEach(it=>{ catCounts[it.cat]=(catCounts[it.cat]||0)+1; });
+  let total=Object.keys(items).length;
+  document.getElementById('cnt-all').textContent=total;
+
+  let cl=document.getElementById('cat-list');
+  let first=cl.children[0];
+  cl.innerHTML=''; cl.appendChild(first);
+  Object.entries(CATS).forEach(([cat,c])=>{
+    if(!catCounts[cat]) return;
+    let el=document.createElement('div');
+    el.className='cat-item'+(activeCat===cat?' active':'');
+    el.dataset.cat=cat;
+    el.innerHTML=`<div class="cat-dot" style="background:${c.color}"></div>${cat}<span class="cat-cnt">${catCounts[cat]}</span>`;
+    el.onclick=()=>filterCat(cat,el);
+    cl.appendChild(el);
+  });
+
+  // Stats
+  let totalBoxes=racks.reduce((a,r)=>a+r.rows*r.cols,0);
+  document.getElementById('s-rak').textContent=racks.length;
+  document.getElementById('s-kotak').textContent=totalBoxes;
+  document.getElementById('s-terisi').textContent=total;
+  document.getElementById('s-pct').textContent=totalBoxes?Math.round(total/totalBoxes*100)+'%':'0%';
+
+  // Rack list
+  let rl=document.getElementById('rack-list-items'); rl.innerHTML='';
+  racks.forEach(rack=>{
+    let filled=Object.values(items).filter(i=>i.rack===rack.id).length;
+    let totalR=rack.rows*rack.cols;
+    let pct=Math.round(filled/totalR*100);
+    let el=document.createElement('div');
+    el.className='rack-item'+(selected&&selected.id===rack.id?' active':'');
+    el.dataset.id=rack.id;
+    el.innerHTML=`
+      <div style="width:8px;height:8px;border-radius:2px;background:${rack.color};flex-shrink:0"></div>
+      <div style="flex:1;min-width:0">
+        <div class="dp-rack-name" style="font-size:11px">${rack.name}</div>
+        <div class="rack-pct-bar"><div class="rack-pct-fill" style="width:${pct}%;background:${rack.color}"></div></div>
+      </div>
+      <span class="rack-pct" style="color:${rack.color}">${pct}%</span>`;
+    el.onclick=()=>{
+      // Focus on this rack in 3D view
+      let pos=getRackWorld(rack);
+      cam.panX=-(proj(pos.x+pos.w/2,0,pos.z+pos.d/2).px - W/2);
+      selected={type:'rack',id:rack.id}; showPanel(selected); draw();
+    };
+    rl.appendChild(el);
+  });
+}
+
+// ============================================================
+//  MODAL (Item Add/Edit)
+// ============================================================
+let editKey=null, pendingRackId=null, pendingCellKey=null;
+
+function openAddModal(rackId, cellKey){
+  editKey=null; pendingRackId=rackId; pendingCellKey=cellKey;
+  document.getElementById('modal-title').textContent='Tambah Sparepart';
+  document.getElementById('f-name').value='';
+  document.getElementById('f-part').value='';
+  document.getElementById('f-cat').value='Bearing';
+  document.getElementById('f-qty').value='1';
+  document.getElementById('f-minqty').value='2';
+  document.getElementById('f-note').value='';
+  if(cellKey){
+    let p=cellKey.split('-'), ri=parseInt(p[0]), ro=parseInt(p[1]), co=parseInt(p[2]);
+    let r=rackById(ri);
+    document.getElementById('f-loc').value=`${r?r.name:'?'} - Baris ${ro+1} - Kolom ${co+1}`;
+  } else if(rackId!=null){
+    let r=rackById(rackId);
+    document.getElementById('f-loc').value=`${r?r.name:'?'} (slot otomatis)`;
+  } else {
+    document.getElementById('f-loc').value='Slot tersedia pertama';
+  }
+  document.getElementById('modal-overlay').classList.add('open');
+  setTimeout(()=>document.getElementById('f-name').focus(),60);
+}
+
+function openEditModal(key){
+  let it=items[key]; if(!it) return;
+  editKey=key;
+  document.getElementById('modal-title').textContent='Edit Sparepart';
+  document.getElementById('f-name').value=it.name;
+  document.getElementById('f-part').value=it.part||'';
+  document.getElementById('f-cat').value=it.cat;
+  document.getElementById('f-qty').value=it.qty;
+  document.getElementById('f-minqty').value=it.minqty||0;
+  document.getElementById('f-note').value=it.note||'';
+  let r=rackById(it.rack);
+  document.getElementById('f-loc').value=`${r?r.name:'?'} - Baris ${it.row+1} - Kolom ${it.col+1}`;
+  document.getElementById('modal-overlay').classList.add('open');
+  setTimeout(()=>document.getElementById('f-name').focus(),60);
+}
+
+function closeModal(){ document.getElementById('modal-overlay').classList.remove('open'); }
+document.getElementById('modal-overlay').addEventListener('click',e=>{
+  if(e.target===document.getElementById('modal-overlay')) closeModal();
+});
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeModal(); });
+
+function findFreeSlot(rackId){
+  let rack=rackById(rackId); if(!rack) return null;
+  for(let r=0;r<rack.rows;r++) for(let c=0;c<rack.cols;c++){
+    let k=`${rackId}-${r}-${c}`; if(!items[k]) return{key:k,rackId,row:r,col:c};
+  }
+  return null;
+}
+function findAnyFree(){
+  for(let rack of racks){ let s=findFreeSlot(rack.id); if(s) return s; }
+  return null;
+}
+
+function saveItem(){
+  let name=document.getElementById('f-name').value.trim();
+  if(!name){ alert('Nama tidak boleh kosong!'); return; }
+  let data={
+    name, part:document.getElementById('f-part').value.trim(),
+    cat:document.getElementById('f-cat').value,
+    qty:parseInt(document.getElementById('f-qty').value)||0,
+    minqty:parseInt(document.getElementById('f-minqty').value)||0,
+    note:document.getElementById('f-note').value.trim(),
+  };
+  if(editKey){
+    items[editKey]={...items[editKey],...data};
+    showToast('✓ Item diperbarui');
+    if(selected&&selected.key===editKey) showPanel(selected);
+  } else {
+    let slot=pendingCellKey&&!items[pendingCellKey]
+      ? (()=>{let p=pendingCellKey.split('-');return{key:pendingCellKey,rackId:parseInt(p[0]),row:parseInt(p[1]),col:parseInt(p[2])};})()
+      : pendingRackId!=null ? findFreeSlot(pendingRackId) : findAnyFree();
+    if(!slot){ alert('Tidak ada slot kosong!'); return; }
+    items[slot.key]={...data,rack:slot.rackId,row:slot.row,col:slot.col,id:slot.key};
+    showToast('✓ Sparepart ditambahkan');
+  }
+  closeModal(); refreshSidebar(); draw();
+}
+
+function deleteItem(key){
+  if(!confirm('Hapus item ini?')) return;
+  delete items[key];
+  selected=null; clearPanel(); refreshSidebar(); draw();
+  showToast('✓ Item dihapus');
+}
+
+// ============================================================
+//  DESIGNER
+// ============================================================
+let dpSelectedRackId = null;
+const DP_SWATCHES=['#e8a020','#4a9fd4','#3db87a','#e05555','#9b7de8',
+                   '#d4906a','#56b86e','#b87a5a','#c0c0b0','#708090'];
+
+function buildSwatches(){
+  let row=document.getElementById('swatch-row'); row.innerHTML='';
+  DP_SWATCHES.forEach(col=>{
+    let el=document.createElement('div');
+    el.className='swatch'; el.style.background=col; el.dataset.color=col;
+    el.onclick=()=>{ document.querySelectorAll('.swatch').forEach(s=>s.classList.remove('active')); el.classList.add('active'); };
+    row.appendChild(el);
+  });
+}
+
+function buildDpRackList(){
+  let el=document.getElementById('dp-rack-items'); el.innerHTML='';
+  racks.forEach(rack=>{
+    let div=document.createElement('div');
+    div.className='dp-rack-item'+(dpSelectedRackId===rack.id?' active':'');
+    div.innerHTML=`<div style="width:8px;height:8px;border-radius:2px;flex-shrink:0;background:${rack.color}"></div>
+      <div><div class="dp-rack-name">${rack.name}</div>
+      <div class="dp-rack-sub">${rack.rows}×${rack.cols} · Pos(${rack.gx},${rack.gz})</div></div>`;
+    div.onclick=()=>selectRackInDesigner(rack.id);
+    el.appendChild(div);
+  });
+}
+
+function selectRackInDesigner(id){
+  dpSelectedRackId=id;
+  let rack=rackById(id); if(!rack) return;
+  document.getElementById('dp-no-sel').style.display='none';
+  document.getElementById('dp-form').style.display='block';
+  document.getElementById('dp-name').value=rack.name;
+  document.getElementById('dp-code').value=rack.code||'';
+  document.getElementById('dp-rows').value=rack.rows;
+  document.getElementById('dp-cols').value=rack.cols;
+  document.getElementById('dp-gx').value=rack.gx;
+  document.getElementById('dp-gz').value=rack.gz;
+  // activate color swatch
+  document.querySelectorAll('.swatch').forEach(s=>{
+    s.classList.toggle('active', s.dataset.color===rack.color);
+  });
+  buildDpRackList();
+  refreshPreview();
+}
+
+function editRackInDesigner(id){
+  switchTab('design', document.querySelectorAll('.tab')[1]);
+  setTimeout(()=>selectRackInDesigner(id), 50);
+}
+
+function refreshPreview(){
+  let rows=parseInt(document.getElementById('dp-rows').value)||1;
+  let cols=parseInt(document.getElementById('dp-cols').value)||1;
+  rows=Math.max(1,Math.min(10,rows));
+  cols=Math.max(1,Math.min(12,cols));
+  let cw=Math.max(28, Math.min(60, Math.floor(320/cols)-6));
+  let ch=Math.max(18, Math.min(40, Math.floor(160/rows)-6));
+  let grid=document.getElementById('dp-grid');
+  grid.style.gridTemplateColumns=`repeat(${cols},${cw}px)`;
+  grid.innerHTML='';
+  for(let r=0;r<rows;r++) for(let c=0;c<cols;c++){
+    let key=dpSelectedRackId!=null?`${dpSelectedRackId}-${r}-${c}`:null;
+    let item=key?items[key]:null;
+    let div=document.createElement('div');
+    div.className='dp-cell'+(item?' filled':'');
+    div.style.width=cw+'px'; div.style.height=ch+'px';
+    if(item){
+      let cat=CATS[item.cat]||CATS['Lainnya'];
+      div.style.borderColor=cat.color+'60';
+      div.style.background=cat.bg;
+      div.innerHTML=`<div class="dp-cell-label">${item.name.slice(0,8)}</div>`;
+    } else {
+      div.innerHTML='';
+    }
+    grid.appendChild(div);
+  }
+}
+
+function saveRack(){
+  if(dpSelectedRackId===null) return;
+  let rack=rackById(dpSelectedRackId); if(!rack) return;
+  let newRows=Math.max(1,Math.min(10,parseInt(document.getElementById('dp-rows').value)||3));
+  let newCols=Math.max(1,Math.min(12,parseInt(document.getElementById('dp-cols').value)||4));
+
+  // Warn if shrinking would delete items
+  let lost=[];
+  Object.entries(items).forEach(([k,it])=>{
+    if(it.rack===rack.id && (it.row>=newRows||it.col>=newCols)) lost.push(k);
+  });
+  if(lost.length && !confirm(`${lost.length} item akan terhapus karena rak diperkecil. Lanjutkan?`)) return;
+  lost.forEach(k=>delete items[k]);
+
+  let selColor=document.querySelector('.swatch.active');
+  rack.name=document.getElementById('dp-name').value||rack.name;
+  rack.code=document.getElementById('dp-code').value||rack.code;
+  rack.rows=newRows; rack.cols=newCols;
+  rack.gx=parseInt(document.getElementById('dp-gx').value)||0;
+  rack.gz=parseInt(document.getElementById('dp-gz').value)||0;
+  rack.color=selColor?selColor.dataset.color:rack.color;
+
+  buildDpRackList(); refreshSidebar(); draw(); refreshPreview();
+  showToast('✓ Rak disimpan');
+}
+
+function deleteRack(){
+  if(dpSelectedRackId===null) return;
+  let rack=rackById(dpSelectedRackId);
+  if(!rack) return;
+  let cnt=Object.values(items).filter(i=>i.rack===rack.id).length;
+  if(!confirm(`Hapus ${rack.name}? Semua ${cnt} item di dalamnya akan ikut terhapus.`)) return;
+  Object.keys(items).filter(k=>items[k].rack===rack.id).forEach(k=>delete items[k]);
+  racks=racks.filter(r=>r.id!==rack.id);
+  dpSelectedRackId=null;
+  document.getElementById('dp-no-sel').style.display='block';
+  document.getElementById('dp-form').style.display='none';
+  buildDpRackList(); refreshSidebar(); draw();
+  showToast('✓ Rak dihapus');
+}
+
+let nextRackId=25;
+function addNewRack(){
+  let id=nextRackId++;
+  let letter=RAK_LETTERS[racks.length%26];
+  racks.push({ id, name:'Rak '+letter, code:letter,
+    rows:3, cols:4, gx:racks.length%5, gz:Math.floor(racks.length/5),
+    color:RACK_COLORS[id%RACK_COLORS.length] });
+  buildDpRackList(); refreshSidebar(); draw();
+  selectRackInDesigner(id);
+  showToast('✓ Rak baru ditambahkan');
+}
+
+// ============================================================
+//  TABS
+// ============================================================
+function switchTab(tab, el){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  if(el) el.classList.add('active');
+  let dp=document.getElementById('designer-panel');
+  if(tab==='design'){
+    dp.classList.add('open');
+    buildDpRackList(); refreshPreview();
+  } else {
+    dp.classList.remove('open');
+    draw();
+  }
+}
+
+function toggleSidebar(){
+  let sl=document.getElementById('sidebar-left');
+  let pr=document.getElementById('panel-right');
+  if(sl.classList.contains('collapsed')){ sl.classList.remove('collapsed'); pr.classList.remove('collapsed'); }
+  else { sl.classList.add('collapsed'); pr.classList.add('collapsed'); }
+  setTimeout(draw,220);
+}
+
+// ============================================================
+//  EXPORT CSV
+// ============================================================
+function exportCSV(){
+  let rows=['Rak,Baris,Kolom,Nama,Nomor Part,Kategori,Stok,Min Stok,Keterangan'];
+  Object.entries(items).forEach(([k,it])=>{
+    let r=rackById(it.rack);
+    rows.push([r?r.name:'?',it.row+1,it.col+1,it.name,it.part,it.cat,it.qty,it.minqty,it.note]
+      .map(v=>`"${String(v||'').replace(/"/g,'""')}"`).join(','));
+  });
+  let blob=new Blob([rows.join('\n')],{type:'text/csv;charset=utf-8;'});
+  let a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download='sparepart_'+new Date().toISOString().slice(0,10)+'.csv'; a.click();
+  showToast('✓ CSV diexport');
+}
+
+// ============================================================
+//  TOAST
+// ============================================================
+let _toastTimer;
+function showToast(msg){
+  let t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show');
+  clearTimeout(_toastTimer); _toastTimer=setTimeout(()=>t.classList.remove('show'),2600);
+}
+
+// ============================================================
+//  RESIZE & INIT
+// ============================================================
+new ResizeObserver(()=>draw()).observe(document.getElementById('canvas-wrap'));
+buildSwatches();
+refreshSidebar();
+draw();
+</script>
+</body>
+</html>
