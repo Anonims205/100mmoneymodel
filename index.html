@@ -1767,6 +1767,24 @@
     <span>Chat Sekarang</span>
   </a>
 
+  <!-- ─── JS ─── -->
+  <script>
+    /* ── Custom Cursor ── */
+    const dot  = document.getElementById('cursor-dot');
+    const ring = document.getElementById('cursor-ring');
+    let mx = 0, my = 0, rx = 0, ry = 0;
+    document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+    (function lerp() {
+      rx += (mx - rx) * .14;
+      ry += (my - ry) * .14;
+      if (dot)  { dot.style.left  = mx + 'px'; dot.style.top  = my + 'px'; }
+      if (ring) { ring.style.left = rx + 'px'; ring.style.top = ry + 'px'; }
+      requestAnimationFrame(lerp);
+    })();
+    document.querySelectorAll('a, button, .product-card, .sol-card, .testi-card, .problem-card').forEach(el => {
+      el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
+      el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
+    });
     // dark sections
     ['problem','products','testimonials','about','cta-final'].forEach(id => {
       const el = document.getElementById(id) || document.querySelector('#'+id);
