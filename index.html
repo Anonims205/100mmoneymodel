@@ -59,36 +59,10 @@
       background: var(--cream);
       color: var(--ink);
       overflow-x: hidden;
-      cursor: none;
     }
     img { display: block; max-width: 100%; }
     a  { text-decoration: none; color: inherit; }
     h1,h2,h3 { font-family: 'Cormorant Garamond', serif; line-height: 1.1; }
-
-    /* ═══════════════════════════════════
-       CUSTOM CURSOR
-    ═══════════════════════════════════ */
-    #cursor-dot {
-      position: fixed; z-index: 9999;
-      width: 8px; height: 8px;
-      background: var(--g300);
-      border-radius: 50%;
-      pointer-events: none;
-      transform: translate(-50%,-50%);
-      transition: transform .1s, background .3s, width .2s, height .2s;
-    }
-    #cursor-ring {
-      position: fixed; z-index: 9998;
-      width: 36px; height: 36px;
-      border: 1.5px solid rgba(94,203,135,.55);
-      border-radius: 50%;
-      pointer-events: none;
-      transform: translate(-50%,-50%);
-      transition: transform .12s var(--ease-out), width .3s var(--ease-out), height .3s var(--ease-out), opacity .3s, border-color .3s;
-    }
-    body.cursor-hover #cursor-dot { width: 12px; height: 12px; background: var(--g400); }
-    body.cursor-hover #cursor-ring { width: 56px; height: 56px; border-color: rgba(94,203,135,.3); }
-    body.cursor-dark  #cursor-ring { border-color: rgba(255,255,255,.35); }
 
     /* ═══════════════════════════════════
        SCROLL PROGRESS
@@ -784,7 +758,6 @@
       box-shadow: 0 40px 80px rgba(0,0,0,.4);
       border-color: rgba(94,203,135,.22);
     }
-    /* 3D tilt effect via JS */
     .product-card { transform-style: preserve-3d; }
 
     .product-img-wrap {
@@ -1212,8 +1185,6 @@
       .hero-left { padding: 120px 24px 60px; }
       :root { --section-pad: 80px 24px; }
       #wa-float { bottom: 24px; right: 24px; }
-      body { cursor: auto; }
-      #cursor-dot, #cursor-ring { display: none; }
     }
     @media (max-width: 480px) {
       .stats-inner { grid-template-columns: 1fr 1fr; }
@@ -1223,10 +1194,6 @@
   </style>
 </head>
 <body>
-
-  <!-- CURSOR -->
-  <div id="cursor-dot"></div>
-  <div id="cursor-ring"></div>
 
   <!-- SCROLL PROGRESS -->
   <div id="scroll-progress"></div>
@@ -1514,7 +1481,13 @@
           <p class="reveal d1">Ribuan orang sudah merasakan perbedaannya.</p>
         </div>
         <div class="reveal d2" style="display:flex;align-items:center;gap:8px">
-          <div style="display:flex;gap:2px">${[1,2,3,4,5].map(()=>'<span style="color:var(--gold2);font-size:1rem">★</span>').join('')}</div>
+          <div style="display:flex;gap:2px">
+            <span style="color:var(--gold2);font-size:1rem">★</span>
+            <span style="color:var(--gold2);font-size:1rem">★</span>
+            <span style="color:var(--gold2);font-size:1rem">★</span>
+            <span style="color:var(--gold2);font-size:1rem">★</span>
+            <span style="color:var(--gold2);font-size:1rem">★</span>
+          </div>
           <span style="font-size:.85rem;color:var(--muted2)">4.9 dari 2400+ ulasan</span>
         </div>
       </div>
@@ -1769,27 +1742,6 @@
 
   <!-- ─── JS ─── -->
   <script>
-    /* ── Custom Cursor ── */
-    const dot  = document.getElementById('cursor-dot');
-    const ring = document.getElementById('cursor-ring');
-    let mx = 0, my = 0, rx = 0, ry = 0;
-    document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
-    (function lerp() {
-      rx += (mx - rx) * .14;
-      ry += (my - ry) * .14;
-      if (dot)  { dot.style.left  = mx + 'px'; dot.style.top  = my + 'px'; }
-      if (ring) { ring.style.left = rx + 'px'; ring.style.top = ry + 'px'; }
-      requestAnimationFrame(lerp);
-    })();
-    document.querySelectorAll('a, button, .product-card, .sol-card, .testi-card, .problem-card').forEach(el => {
-      el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
-      el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
-    });
-    // dark sections
-    ['problem','products','testimonials','about','cta-final'].forEach(id => {
-      const el = document.getElementById(id) || document.querySelector('#'+id);
-    });
-
     /* ── Scroll Progress ── */
     const prog = document.getElementById('scroll-progress');
     window.addEventListener('scroll', () => {
